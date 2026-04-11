@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.dependencies import get_db, get_current_active_user
 from app.crud.favorites import crud_favorite
@@ -12,12 +12,24 @@ from app.models.favorites import Favorite
 router = APIRouter(prefix="/favorites", tags=["Favorites"])
 
 
+def _localize_profession(p, lang: str):
+    if lang == "ru":
+        if p.title_ru:
+            p.title = p.title_ru
+        if p.description_ru:
+            p.description = p.description_ru
+        if p.category_ru:
+            p.category = p.category_ru
+    return p
+
+
 @router.get(
     "/",
     response_model=list[FavoriteResponse],
     summary="Get all favorites for current user",
 )
 async def get_favorites(
+    lang: str = Query("kk"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
@@ -27,7 +39,11 @@ async def get_favorites(
         .options(selectinload(Favorite.profession))
         .order_by(Favorite.created_at.desc())
     )
-    return list(result.scalars().all())
+    favs = list(result.scalars().all())
+    for fav in favs:
+        if fav.profession:
+            _localize_profession(fav.profession, lang)
+    return favs
 
 
 @router.post(

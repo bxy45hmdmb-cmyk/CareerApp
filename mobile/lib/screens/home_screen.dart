@@ -127,10 +127,14 @@ class _HomeTabState extends State<_HomeTab> {
   void initState() {
     super.initState();
     _loadData();
+    LangController.instance.addListener(_onLangChanged);
   }
+
+  void _onLangChanged() => _loadData();
 
   @override
   void dispose() {
+    LangController.instance.removeListener(_onLangChanged);
     _carouselCtrl.dispose();
     super.dispose();
   }

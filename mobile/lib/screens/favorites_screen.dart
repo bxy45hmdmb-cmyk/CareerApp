@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/api_service.dart';
+import '../core/lang_controller.dart';
 import '../theme/app_theme.dart';
 import 'profession_details_screen.dart';
 
@@ -21,6 +22,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   void initState() {
     super.initState();
     _load();
+    LangController.instance.addListener(_onLangChanged);
+  }
+
+  void _onLangChanged() => _load();
+
+  @override
+  void dispose() {
+    LangController.instance.removeListener(_onLangChanged);
+    super.dispose();
   }
 
   Future<void> _load() async {

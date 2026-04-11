@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/api_service.dart';
+import '../core/lang_controller.dart';
 import '../theme/app_theme.dart';
 import 'test_result_screen.dart';
 import 'test_history_screen.dart';
@@ -39,10 +40,21 @@ class _CareerTestScreenState extends State<CareerTestScreen>
         .animate(CurvedAnimation(parent: _cardCtrl, curve: Curves.easeOutCubic));
     _fadeAnim = Tween<double>(begin: 0, end: 1).animate(_cardCtrl);
     _loadQuestions();
+    LangController.instance.addListener(_onLangChanged);
+  }
+
+  void _onLangChanged() {
+    setState(() {
+      _answers.clear();
+      _currentIdx = 0;
+      _testStarted = false;
+    });
+    _loadQuestions();
   }
 
   @override
   void dispose() {
+    LangController.instance.removeListener(_onLangChanged);
     _cardCtrl.dispose();
     super.dispose();
   }

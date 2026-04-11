@@ -337,7 +337,7 @@ class ApiService {
   // ── Favorites ──────────────────────────────────────────────────────────────
 
   Future<List<dynamic>> getFavorites() async {
-    final res = await _getWithRefresh('$baseUrl/favorites/');
+    final res = await _getWithRefresh('$baseUrl/favorites/?lang=$_lang');
     return _decodeList(res);
   }
 
