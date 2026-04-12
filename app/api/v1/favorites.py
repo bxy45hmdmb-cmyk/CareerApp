@@ -34,6 +34,7 @@ async def get_favorites(
             if fav.profession:
                 t = await crud_profession.get_translation(db, fav.profession.id, lang)
                 if t:
+                    db.expunge(fav.profession)
                     fav.profession.title = t.title
                     fav.profession.description = t.description
                     fav.profession.category = t.category

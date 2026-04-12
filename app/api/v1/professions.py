@@ -37,6 +37,7 @@ async def list_professions(
         for p in profs:
             t = await crud_profession.get_translation(db, p.id, lang)
             if t:
+                db.expunge(p)
                 _apply_translation(p, t)
     return profs
 
@@ -55,6 +56,7 @@ async def get_high_demand_professions(
         for p in sorted_profs:
             t = await crud_profession.get_translation(db, p.id, lang)
             if t:
+                db.expunge(p)
                 _apply_translation(p, t)
     return sorted_profs
 
@@ -75,6 +77,7 @@ async def get_profession(
     if lang != "kk":
         t = await crud_profession.get_translation(db, profession.id, lang)
         if t:
+            db.expunge(profession)
             _apply_translation(profession, t)
     universities = await crud_profession.get_universities_for_profession(
         db, category_key=profession.category_key

@@ -5,7 +5,7 @@ from app.crud.question import crud_question
 from app.schemas.question import QuestionResponse, QuestionCreate, QuestionUpdate
 from app.models.user import User
 
-router = APIRouter(prefix="/questions", tags=["Career Test Questions"])
+router =  APIRouter(prefix="/questions", tags=["Career Test Questions"])
 
 
 @router.get(
@@ -24,6 +24,7 @@ async def get_questions(
         for q in questions:
             t = trans_map.get(q.id)
             if t:
+                db.expunge(q)
                 q.text = t.text
                 q.options = t.options
     return questions
