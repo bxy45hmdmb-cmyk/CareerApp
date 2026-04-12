@@ -1,4 +1,3 @@
-import json
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.dependencies import get_db, get_current_active_user
@@ -7,19 +6,6 @@ from app.schemas.question import QuestionResponse, QuestionCreate, QuestionUpdat
 from app.models.user import User
 
 router = APIRouter(prefix="/questions", tags=["Career Test Questions"])
-
-
-def _localize_question(q, lang: str):
-    """Replace KK text/options with RU translations when lang=ru."""
-    if lang == "ru":
-        if q.text_ru:
-            q.text = q.text_ru
-        if q.options_ru:
-            opts = q.options_ru
-            if isinstance(opts, str):
-                opts = json.loads(opts)
-            q.options = opts
-    return q
 
 
 @router.get(
@@ -33,7 +19,14 @@ async def get_questions(
     current_user: User = Depends(get_current_active_user),
 ):
     questions = await crud_question.get_multi_active(db)
-    return [_localize_question(q, lang) for q in questions]
+    if lang != "kk":
+        trans_map = await crud_question.get_translations_for_lang(db, lang)
+        for q in questions:
+            t = trans_map.get(q.id)
+            if t:
+                q.text = t.text
+                q.options = t.options
+    return questions
 
 
 @router.post(

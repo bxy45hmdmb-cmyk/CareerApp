@@ -28,9 +28,27 @@ class Question(Base):
     answers: Mapped[list["Answer"]] = relationship(
         "Answer", back_populates="question"
     )
+    translations: Mapped[list["QuestionTranslation"]] = relationship(
+        "QuestionTranslation", back_populates="question", cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<Question id={self.id} category={self.category}>"
+
+
+class QuestionTranslation(Base):
+    """Stores translated text/options for a question (e.g. lang='ru')."""
+    __tablename__ = "question_translations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    question_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("questions.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    lang: Mapped[str] = mapped_column(String(10), nullable=False)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+    options: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+
+    question: Mapped["Question"] = relationship("Question", back_populates="translations")
 
 
 class Answer(Base):

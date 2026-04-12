@@ -78,7 +78,7 @@ class _CareerTestScreenState extends State<CareerTestScreen>
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Сұрақтарды жүктеу сәтсіз';
+        _error = LangScope.s(context).questionLoadFailed;
         _loading = false;
       });
     }
@@ -134,8 +134,8 @@ class _CareerTestScreenState extends State<CareerTestScreen>
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Нәтижені сақтау сәтсіз аяқталды'),
+        SnackBar(
+          content: Text(LangScope.s(context).testSubmitFailed),
           backgroundColor: AppTheme.accentColor,
         ),
       );
@@ -158,7 +158,7 @@ class _CareerTestScreenState extends State<CareerTestScreen>
               Text(_error!),
               const SizedBox(height: 16),
               ElevatedButton(
-                  onPressed: _loadQuestions, child: const Text('Қайталау')),
+                  onPressed: _loadQuestions, child: Text(LangScope.s(context).retry)),
             ],
           ),
         ),
@@ -177,23 +177,22 @@ class _CareerTestScreenState extends State<CareerTestScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              Text('Кәсіптік\nБағдар Тесті 🎯',
+              Text(LangScope.s(context).testIntroTitle,
                   style: Theme.of(context).textTheme.displayMedium),
               const SizedBox(height: 16),
               Text(
-                'Бұл тест сенің қызығушылықтарыңды, қабілеттеріңді және '
-                'пәндік бейімділіктеріңді анықтап, саған сай мамандықтарды ұсынады.',
+                LangScope.s(context).testIntroDesc,
                 style: Theme.of(context)
                     .textTheme
                     .bodyLarge
                     ?.copyWith(height: 1.6),
               ),
               const SizedBox(height: 32),
-              _infoTile('📝', 'Сұрақ саны', '${_questions.length} сұрақ'),
+              _infoTile('📝', LangScope.s(context).questionCountLabel, LangScope.s(context).questionCountValue(_questions.length)),
               const SizedBox(height: 12),
-              _infoTile('⏱️', 'Болжалды уақыт', '5-10 минут'),
+              _infoTile('⏱️', LangScope.s(context).estimatedTimeLabel, '5-10 мин'),
               const SizedBox(height: 12),
-              _infoTile('🎯', 'Нәтиже', 'Жеке мамандық ұсыныстары'),
+              _infoTile('🎯', LangScope.s(context).resultLabel, LangScope.s(context).resultDesc),
               const Spacer(),
               if (_hasHistory)
                 Padding(
@@ -209,7 +208,7 @@ class _CareerTestScreenState extends State<CareerTestScreen>
                         ),
                       ),
                       icon: const Icon(Icons.history_rounded),
-                      label: const Text('Тест тарихы'),
+                      label: Text(LangScope.s(context).testHistoryBtn),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppTheme.primaryColor,
                         side: const BorderSide(color: AppTheme.primaryColor),
@@ -231,7 +230,7 @@ class _CareerTestScreenState extends State<CareerTestScreen>
                     });
                     _cardCtrl.forward();
                   },
-                  child: const Text('Тестті бастау 🚀'),
+                  child: Text('${LangScope.s(context).startTest} 🚀'),
                 ),
               ),
             ],
@@ -274,14 +273,14 @@ class _CareerTestScreenState extends State<CareerTestScreen>
 
   Widget _buildTest() {
     if (_submitting) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Нәтиже есептелуде...'),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(LangScope.s(context).computing),
             ],
           ),
         ),
@@ -316,7 +315,7 @@ class _CareerTestScreenState extends State<CareerTestScreen>
                     const SizedBox(width: 40),
                   Expanded(
                     child: Text(
-                      'Сұрақ ${_currentIdx + 1} / ${_questions.length}',
+                      LangScope.s(context).questionCounter(_currentIdx + 1, _questions.length),
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: AppTheme.primaryColor,

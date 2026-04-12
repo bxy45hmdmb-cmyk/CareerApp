@@ -18,7 +18,9 @@ class Profession(Base):
     icon_emoji: Mapped[str] = mapped_column(String(10), default="💼")
     color_hex: Mapped[str] = mapped_column(String(20), default="#6C63FF")
     required_skills: Mapped[list] = mapped_column(JSON, default=list)
+    required_skills_ru: Mapped[list | None] = mapped_column(JSON, nullable=True)
     future_opportunities: Mapped[list] = mapped_column(JSON, default=list)
+    future_opportunities_ru: Mapped[list | None] = mapped_column(JSON, nullable=True)
     salary_min: Mapped[int | None] = mapped_column(Integer, nullable=True)
     salary_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
     salary_currency: Mapped[str] = mapped_column(String(10), default="KZT")
@@ -46,9 +48,31 @@ class Profession(Base):
     recommendations: Mapped[list["Recommendation"]] = relationship(
         "Recommendation", back_populates="profession"
     )
+    translations: Mapped[list["ProfessionTranslation"]] = relationship(
+        "ProfessionTranslation", back_populates="profession",
+        cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<Profession id={self.id} title={self.title}>"
+
+
+class ProfessionTranslation(Base):
+    """Stores translated fields for a profession (e.g. lang='ru')."""
+    __tablename__ = "profession_translations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    profession_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("professions.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    lang: Mapped[str] = mapped_column(String(10), nullable=False)  # 'ru', 'en', ...
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    category: Mapped[str] = mapped_column(String(100), nullable=False)
+    required_skills: Mapped[list] = mapped_column(JSON, default=list)
+    future_opportunities: Mapped[list] = mapped_column(JSON, default=list)
+
+    profession: Mapped["Profession"] = relationship("Profession", back_populates="translations")
 
 
 class DevelopmentPath(Base):

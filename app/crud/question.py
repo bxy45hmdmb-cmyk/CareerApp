@@ -1,7 +1,7 @@
 from typing import Optional
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.question import Question, Answer
+from app.models.question import Question, Answer, QuestionTranslation
 from app.models.test_result import TestResult
 from app.schemas.question import QuestionCreate, QuestionUpdate
 
@@ -62,6 +62,27 @@ class CRUDQuestion:
         db.add(answer)
         await db.flush()
         return answer
+
+
+    async def get_translation(
+        self, db: AsyncSession, question_id: int, lang: str
+    ) -> Optional[QuestionTranslation]:
+        result = await db.execute(
+            select(QuestionTranslation).where(
+                QuestionTranslation.question_id == question_id,
+                QuestionTranslation.lang == lang,
+            )
+        )
+        return result.scalar_one_or_none()
+
+    async def get_translations_for_lang(
+        self, db: AsyncSession, lang: str
+    ) -> dict[int, QuestionTranslation]:
+        """Return all translations for a given lang, keyed by question_id."""
+        result = await db.execute(
+            select(QuestionTranslation).where(QuestionTranslation.lang == lang)
+        )
+        return {t.question_id: t for t in result.scalars().all()}
 
 
 crud_question = CRUDQuestion()

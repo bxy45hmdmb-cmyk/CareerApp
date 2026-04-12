@@ -12,17 +12,6 @@ from app.models.favorites import Favorite
 router = APIRouter(prefix="/favorites", tags=["Favorites"])
 
 
-def _localize_profession(p, lang: str):
-    if lang == "ru":
-        if p.title_ru:
-            p.title = p.title_ru
-        if p.description_ru:
-            p.description = p.description_ru
-        if p.category_ru:
-            p.category = p.category_ru
-    return p
-
-
 @router.get(
     "/",
     response_model=list[FavoriteResponse],
@@ -40,9 +29,16 @@ async def get_favorites(
         .order_by(Favorite.created_at.desc())
     )
     favs = list(result.scalars().all())
-    for fav in favs:
-        if fav.profession:
-            _localize_profession(fav.profession, lang)
+    if lang != "kk":
+        for fav in favs:
+            if fav.profession:
+                t = await crud_profession.get_translation(db, fav.profession.id, lang)
+                if t:
+                    fav.profession.title = t.title
+                    fav.profession.description = t.description
+                    fav.profession.category = t.category
+                    fav.profession.required_skills = t.required_skills
+                    fav.profession.future_opportunities = t.future_opportunities
     return favs
 
 

@@ -192,6 +192,18 @@ class AppStrings {
 
   // Career test screen
   String get testTitle => isKk ? 'Кәсіптік тест' : 'Профориентационный тест';
+  String get testIntroTitle => isKk ? 'Кәсіптік\nБағдар Тесті 🎯' : 'Профориентационный\nТест 🎯';
+  String get testIntroDesc => isKk
+      ? 'Бұл тест сенің қызығушылықтарыңды, қабілеттеріңді және пәндік бейімділіктеріңді анықтап, саған сай мамандықтарды ұсынады.'
+      : 'Этот тест определит твои интересы, способности и склонности, чтобы предложить подходящие профессии.';
+  String get questionCountLabel => isKk ? 'Сұрақ саны' : 'Количество вопросов';
+  String questionCountValue(int n) => isKk ? '$n сұрақ' : '$n вопросов';
+  String get estimatedTimeLabel => isKk ? 'Болжалды уақыт' : 'Примерное время';
+  String get resultLabel => isKk ? 'Нәтиже' : 'Результат';
+  String get resultDesc => isKk ? 'Жеке мамандық ұсыныстары' : 'Персональные рекомендации';
+  String get testHistoryBtn => isKk ? 'Тест тарихы' : 'История тестов';
+  String get computing => isKk ? 'Нәтиже есептелуде...' : 'Вычисляем результат...';
+  String questionCounter(int current, int total) => isKk ? 'Сұрақ $current / $total' : 'Вопрос $current / $total';
   String get testDesc => isKk
       ? 'Өзіңе сай мамандықты анықтауға арналған сұрақтарға жауап бер'
       : 'Ответь на вопросы для определения подходящей тебе профессии';
@@ -210,6 +222,29 @@ class AppStrings {
       ? 'Нәтижеңізге сәйкес мамандықтар ұсынылды'
       : 'По вашим результатам рекомендованы профессии';
   String get viewResults => isKk ? 'Нәтижені қарау' : 'Посмотреть результаты';
+
+  // Profession details screen
+  String get descriptionSection => isKk ? '📋 Сипаттама' : '📋 Описание';
+  String get skillsSection => isKk ? '💪 Қажетті дағдылар' : '💪 Необходимые навыки';
+  String get opportunitiesSection => isKk ? '🌟 Болашақ мүмкіндіктері' : '🌟 Перспективы';
+  String universitiesSection(int n) => isKk ? '🏛️ Қазақстандағы университеттер ($n)' : '🏛️ Университеты Казахстана ($n)';
+  String get noUniversities => isKk ? 'Бұл мамандық бойынша университет деректері жоқ' : 'Нет данных об университетах для этой профессии';
+  String get professionNotFound => isKk ? 'Мамандық табылмады' : 'Профессия не найдена';
+  String get nationalUniversity => isKk ? '🏆 Ұлттық университет' : '🏆 Национальный университет';
+  String get salaryLabel => isKk ? 'Жалақы' : 'Зарплата';
+  String get demandLabel => isKk ? 'Сұраныс' : 'Спрос';
+  String get growthLabel => isKk ? 'Өсім' : 'Рост';
+  String get noSalaryData => isKk ? 'Жоқ деректер' : 'Нет данных';
+  String get addToFavorites => isKk ? 'Таңдаулыларға қосу' : 'В избранное';
+  String get removeFromFavoritesBtn => isKk ? 'Таңдаулылардан жою' : 'Удалить из избранного';
+  String get addedToFavorites => isKk ? 'Таңдаулыларға қосылды ⭐' : 'Добавлено в избранное ⭐';
+  String get removedFromFavorites => isKk ? 'Таңдаулылардан жойылды' : 'Удалено из избранного';
+  String get favoriteSaveFailed => isKk ? 'Сақтау сәтсіз аяқталды' : 'Не удалось сохранить';
+  String demandLevelShort(String level) {
+    final kk = {'very_high': 'Өте жоғары', 'high': 'Жоғары', 'medium': 'Орташа', 'low': 'Төмен'};
+    final ru = {'very_high': 'Очень высокий', 'high': 'Высокий', 'medium': 'Средний', 'low': 'Низкий'};
+    return isKk ? (kk[level] ?? level) : (ru[level] ?? level);
+  }
 
   // Favorites screen
   String get favoritesTitle => isKk ? 'Таңдаулы мамандықтар' : 'Избранные профессии';

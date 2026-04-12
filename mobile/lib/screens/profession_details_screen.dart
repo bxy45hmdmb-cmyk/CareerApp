@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/api_service.dart';
+import '../core/lang_controller.dart';
 import '../theme/app_theme.dart';
 
 class ProfessionDetailsScreen extends StatefulWidget {
@@ -24,6 +25,15 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
   void initState() {
     super.initState();
     _load();
+    LangController.instance.addListener(_onLangChanged);
+  }
+
+  void _onLangChanged() => _load();
+
+  @override
+  void dispose() {
+    LangController.instance.removeListener(_onLangChanged);
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -46,7 +56,7 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Деректерді жүктеу сәтсіз';
+        _error = LangScope.s(context).dataLoadFailed;
         _loading = false;
       });
     }
@@ -57,17 +67,18 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
     setState(() => _favLoading = true);
     try {
       final id = _profession!['id'] as int;
+      final s = LangScope.s(context);
       if (_isFavorite) {
         await _api.removeFavorite(id);
         setState(() => _isFavorite = false);
-        _snack('Таңдаулылардан жойылды', AppTheme.accentColor);
+        _snack(s.removedFromFavorites, AppTheme.accentColor);
       } else {
         await _api.addFavorite(id);
         setState(() => _isFavorite = true);
-        _snack('Таңдаулыларға қосылды ⭐', AppTheme.successColor);
+        _snack(s.addedToFavorites, AppTheme.successColor);
       }
     } catch (e) {
-      _snack('Сақтау сәтсіз аяқталды', AppTheme.accentColor);
+      _snack(LangScope.s(context).favoriteSaveFailed, AppTheme.accentColor);
     } finally {
       if (mounted) setState(() => _favLoading = false);
     }
@@ -97,9 +108,9 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(_error ?? 'Мамандық табылмады'),
+              Text(_error ?? LangScope.s(context).professionNotFound),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: _load, child: const Text('Қайталау')),
+              ElevatedButton(onPressed: _load, child: Text(LangScope.s(context).retry)),
             ],
           ),
         ),
@@ -143,8 +154,8 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
                             ),
                             label: Text(
                               _isFavorite
-                                  ? 'Таңдаулылардан жою'
-                                  : 'Таңдаулыларға қосу',
+                                  ? LangScope.s(context).removeFromFavoritesBtn
+                                  : LangScope.s(context).addToFavorites,
                               style: TextStyle(
                                 color: _isFavorite
                                     ? AppTheme.warningColor
@@ -167,7 +178,7 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
                   const SizedBox(height: 24),
 
                   // Description
-                  _sectionTitle('📋 Сипаттама'),
+                  _sectionTitle(LangScope.s(context).descriptionSection),
                   const SizedBox(height: 10),
                   Text(p['description'] ?? '',
                       style: Theme.of(context)
@@ -177,7 +188,7 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
                   const SizedBox(height: 24),
 
                   // Skills
-                  _sectionTitle('💪 Қажетті дағдылар'),
+                  _sectionTitle(LangScope.s(context).skillsSection),
                   const SizedBox(height: 12),
                   _skillChips(p['required_skills'], color),
                   const SizedBox(height: 24),
@@ -185,7 +196,7 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
                   // Opportunities
                   if ((p['future_opportunities'] as List?)?.isNotEmpty ==
                       true) ...[
-                    _sectionTitle('🌟 Болашақ мүмкіндіктері'),
+                    _sectionTitle(LangScope.s(context).opportunitiesSection),
                     const SizedBox(height: 12),
                     ...(p['future_opportunities'] as List).map((opp) => Padding(
                           padding: const EdgeInsets.only(bottom: 8),
@@ -214,8 +225,7 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
                   ],
 
                   // Universities
-                  _sectionTitle(
-                      '🏛️ Қазақстандағы университеттер (${_universities.length})'),
+                  _sectionTitle(LangScope.s(context).universitiesSection(_universities.length)),
                   const SizedBox(height: 12),
                   _universities.isEmpty
                       ? Container(
@@ -224,8 +234,7 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
                             color: Colors.grey.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Text(
-                              'Бұл мамандық бойынша университет деректері жоқ'),
+                          child: Text(LangScope.s(context).noUniversities),
                         )
                       : Column(
                           children: _universities
@@ -289,30 +298,24 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
   }
 
   Widget _infoCards(Map<String, dynamic> p, Color color) {
+    final s = LangScope.s(context);
     final salaryMin = p['salary_min'];
     final salaryMax = p['salary_max'];
     final salaryStr = salaryMin != null && salaryMax != null
         ? '${_fmt(salaryMin)}–${_fmt(salaryMax)} ₸'
-        : 'Жоқ деректер';
-
-    final demandLabels = {
-      'very_high': 'Өте жоғары',
-      'high': 'Жоғары',
-      'medium': 'Орташа',
-      'low': 'Төмен',
-    };
+        : s.noSalaryData;
 
     return Row(
       children: [
         Expanded(
-          child: _infoTile('💰', 'Жалақы', salaryStr, AppTheme.successColor),
+          child: _infoTile('💰', s.salaryLabel, salaryStr, AppTheme.successColor),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: _infoTile(
             '📈',
-            'Сұраныс',
-            demandLabels[p['demand_level']] ?? p['demand_level'] ?? '',
+            s.demandLabel,
+            s.demandLevelShort(p['demand_level'] ?? ''),
             color,
           ),
         ),
@@ -320,7 +323,7 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
         Expanded(
           child: _infoTile(
             '🚀',
-            'Өсім',
+            s.growthLabel,
             p['growth_rate'] ?? '—',
             AppTheme.warningColor,
           ),
@@ -423,8 +426,8 @@ class _ProfessionDetailsScreenState extends State<ProfessionDetailsScreen> {
                           color: AppTheme.warningColor.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text(
-                          '🏆 Ұлттық университет',
+                        child: Text(
+                          LangScope.s(context).nationalUniversity,
                           style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,

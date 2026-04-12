@@ -2,7 +2,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from app.models.profession import Profession, DevelopmentPath
+from app.models.profession import Profession, DevelopmentPath, ProfessionTranslation
 from app.models.university import University
 
 
@@ -73,6 +73,18 @@ class CRUDProfession:
         result = await db.execute(select(University))
         all_unis = list(result.scalars().all())
         return [u for u in all_unis if category_key in (u.category_keys or [])]
+
+
+    async def get_translation(
+        self, db: AsyncSession, profession_id: int, lang: str
+    ) -> Optional[ProfessionTranslation]:
+        result = await db.execute(
+            select(ProfessionTranslation).where(
+                ProfessionTranslation.profession_id == profession_id,
+                ProfessionTranslation.lang == lang,
+            )
+        )
+        return result.scalar_one_or_none()
 
 
 crud_profession = CRUDProfession()
