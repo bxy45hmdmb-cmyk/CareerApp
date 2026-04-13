@@ -434,16 +434,20 @@ class _HomeTabState extends State<_HomeTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(prof['icon_emoji'] ?? '💼',
-                      style: const TextStyle(fontSize: 36)),
+                      style: const TextStyle(fontSize: 32)),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(prof['title'] ?? '',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: color)),
                       Text(prof['category'] ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: Theme.of(context)
                               .textTheme
                               .bodySmall

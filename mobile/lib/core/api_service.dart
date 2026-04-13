@@ -15,7 +15,7 @@ class ApiException implements Exception {
 
 class ApiService {
   // ⚠️  Change to your machine's IP when testing on a real device
-  static const String baseUrl = 'http://192.168.1.107:8003/api/v1';
+  static const String baseUrl = 'http://10.0.2.2:8003/api/v1';
 
   final TokenStorage _storage = TokenStorage();
 
