@@ -74,6 +74,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     : null,
                 onTap: () => lang.setLocale('ru'),
               ),
+              _divider(),
+              _tile(
+                icon: Icons.language_rounded,
+                label: s.english,
+                trailing: lang.locale == 'en'
+                    ? const Icon(Icons.check_circle, color: AppTheme.primaryColor, size: 20)
+                    : null,
+                onTap: () => lang.setLocale('en'),
+              ),
             ]),
             const SizedBox(height: 20),
 
